@@ -34,8 +34,7 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
     // This sets up the voice channel with the permissions for it
     var channel = {type: 'voice', parent: privatechannel_id, permissionOverwrites: [{id: server.id, deny: ['VIEW_CHANNEL']},{id: current_user.id, allow: ['MOVE_MEMBERS']}]};
     server.channels.create(current_user.username, channel).then(channel => { newMember.setChannel(channel); userchannellist.push(channel)});
-    console.log(newMember.channel.members.size);
-  }
+    }
   
   // deltes userchannel if the channel was created with this bot & is empty now
   if(oldMember.channel !== null && userchannellist.includes(oldMember.channel) && oldMember.channel.members.size === 0){
