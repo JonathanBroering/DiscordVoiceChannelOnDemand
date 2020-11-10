@@ -4,7 +4,7 @@ const jsonfile = require("jsonfile");
 const client = new Discord.Client();
 
 // Import config file with bot token,
-// the voice channel id which creates a new channel if joined (everyone needs to have move permission),
+// the voice channel id which creates a new channel if joined
 // and the category in which all the private Channels will be created in
 const {
     cmdPrefix,
