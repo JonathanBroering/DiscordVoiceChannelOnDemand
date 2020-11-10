@@ -1,4 +1,5 @@
 const Discord = require("discord.js");
+const fs = require("fs");
 const jsonfile = require("jsonfile");
 const client = new Discord.Client();
 
@@ -12,6 +13,17 @@ const {
     privatechannel_id,
 } = require("./config.json");
 
+client.commands = new Discord.Collection();
+
+const commandFiles = fs
+    .readdirSync("./commands")
+    .filter((file) => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    client.commands.set(command.name, command);
+}
+
 var userchannellist = [];
 
 // Login
@@ -20,6 +32,40 @@ client.login(token);
 // Output if the bot has connected to Discord
 client.once("ready", () => {
     console.log("Bot is up & running!");
+});
+
+// Listen for commands
+client.on("message", async (message) => {
+    if (!message.content.startsWith(prefix)) return;
+
+    let args = message.content.slice(prefix.length).split(/ +/);
+    let commandName = args.shift().toLowerCase();
+
+    let command =
+        client.commands.get(commandName) ||
+        client.commands.find(
+            (cmd) => cmd.aliases && cmd.aliases.includes(commandName)
+        );
+
+    if (!command) {
+        return message.channel.send(
+            `Weiß nicht, was ${message.author} von mir will! 🤔`
+        );
+    }
+
+    if (
+        command.adminRequired &&
+        !message.member.roles.cache.some((role) => role.name === "Admin")
+    ) {
+        return message.channel.send(`Ich höre nicht auf ${message.author}! 🤪`);
+    }
+
+    try {
+        command.execute(message, args);
+    } catch (error) {
+        console.error(error);
+        message.reply("da ist wohl etwas schiefgelaufen! 😬");
+    }
 });
 
 // Event if a Userer joined or switched his voice Channel
