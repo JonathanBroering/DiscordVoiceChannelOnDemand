@@ -32,14 +32,14 @@ client.login(botToken);
 
 // Output if the bot has connected to Discord
 client.once("ready", () => {
-    console.log("Bot is up & running!");
+    console.log(`${client.user.username} is up & running!`);
     setActivityWatching();
 });
 
 client.on("guildMemberAdd", async (member) => {
     setActivityWatching();
     // send notification to log channel?
-    // member.send("something");
+    // member.send('something');
 });
 
 client.on("guildMemberRemove", async (member) => {
