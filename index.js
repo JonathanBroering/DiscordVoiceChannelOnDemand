@@ -11,6 +11,7 @@ const {
     token,
     newchannel_id,
     privatechannel_id,
+    serverguild_id,
 } = require("./config.json");
 
 client.commands = new Discord.Collection();
@@ -32,6 +33,18 @@ client.login(token);
 // Output if the bot has connected to Discord
 client.once("ready", () => {
     console.log("Bot is up & running!");
+    setActivityWatching();
+});
+
+client.on("guildMemberAdd", async (member) => {
+    setActivityWatching();
+    // send notification to log channel?
+    // member.send("something");
+});
+
+client.on("guildMemberRemove", async (member) => {
+    setActivityWatching();
+    // send notification to log channel?
 });
 
 // Listen for commands
@@ -113,3 +126,14 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
         oldMember.channel.delete();
     }
 });
+
+// Updates the status of the bot to show the size of the server
+function setActivityWatching() {
+    client.user.setActivity(
+        `over ${
+            client.guilds.cache.find((guild) => guild.id === serverguild_id)
+                .memberCount
+        } members`,
+        { type: "WATCHING" }
+    );
+}
