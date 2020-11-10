@@ -4,14 +4,14 @@ const jsonfile = require("jsonfile");
 const client = new Discord.Client();
 
 // Import config file with bot token,
-// the voice channel id which creates a new, private Channel, if joined,
+// the voice channel id which creates a new channel if joined (everyone needs to have move permission),
 // and the category in which all the private Channels will be created in
 const {
-    prefix,
-    token,
-    newchannel_id,
-    privatechannel_id,
-    serverguild_id,
+    cmdPrefix,
+    botToken,
+    createChannelId,
+    channelCategoryId,
+    serverId,
 } = require("./config.json");
 
 client.commands = new Discord.Collection();
@@ -28,7 +28,7 @@ for (const file of commandFiles) {
 var userchannellist = [];
 
 // Login
-client.login(token);
+client.login(botToken);
 
 // Output if the bot has connected to Discord
 client.once("ready", () => {
@@ -49,9 +49,9 @@ client.on("guildMemberRemove", async (member) => {
 
 // Listen for commands
 client.on("message", async (message) => {
-    if (!message.content.startsWith(prefix)) return;
+    if (!message.content.startsWith(cmdPrefix)) return;
 
-    let args = message.content.slice(prefix.length).split(/ +/);
+    let args = message.content.slice(cmdPrefix.length).split(/ +/);
     let commandName = args.shift().toLowerCase();
 
     let command =
@@ -84,7 +84,7 @@ client.on("message", async (message) => {
 // Event if a user joined or switched his voice Channel
 client.on("voiceStateUpdate", (oldMember, newMember) => {
     // Check if the Channel the user joined or switched to has the same id as newchannel
-    if (newMember.channel && newMember.channel.id === newchannel_id) {
+    if (newMember.channel && newMember.channel.id === createChannelId) {
         var current_user = newMember.member.user;
         console.log(
             current_user.username +
@@ -94,12 +94,20 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
         // Create a new voice channel for the request
         var server = newMember.guild;
         // Set up the voice channel with the permissions for it
+        // Only the creator can connect to his channel and move users into it
         var channel = {
             type: "voice",
-            parent: privatechannel_id,
+            parent: channelCategoryId,
             permissionOverwrites: [
-                { id: server.id, deny: ["VIEW_CHANNEL"] },
-                { id: current_user.id, allow: ["MOVE_MEMBERS"] },
+                {
+                    id: server.id,
+                    deny: ["CONNECT"],
+                    allow: ["VIEW_CHANNEL", "SPEAK"],
+                },
+                {
+                    id: current_user.id,
+                    allow: ["VIEW_CHANNEL", "CONNECT", "MOVE_MEMBERS"],
+                },
             ],
         };
         server.channels
@@ -124,7 +132,7 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
 function setActivityWatching() {
     client.user.setActivity(
         `over ${
-            client.guilds.cache.find((guild) => guild.id === serverguild_id)
+            client.guilds.cache.find((guild) => guild.id === serverId)
                 .memberCount
         } members`,
         { type: "WATCHING" }

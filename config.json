@@ -1,7 +1,7 @@
 {
-    "prefix": "!",
-    "token": "xxxxxxxxxxxx",
-    "newchannel_id": "xxxxxxxxxxxx",
-    "privatechannel_id": "xxxxxxxxxxxx",
-    "serverguild_id": "xxxxxxxxxxxx"
+    "cmdPrefix": "!",
+    "botToken": "xxxxxxxxxxxxx",
+    "createChannelId": "xxxxxxxxxxxxx",
+    "channelCategoryId": "xxxxxxxxxxxxx",
+    "serverId": "xxxxxxxxxxxxx"
 }

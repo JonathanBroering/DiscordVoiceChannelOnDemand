@@ -1,4 +1,4 @@
-const { prefix } = require("../config.json");
+const { cmdPrefix } = require("../config.json");
 
 module.exports = {
     name: "help",
@@ -14,7 +14,7 @@ module.exports = {
             data.push("Here's a list of all my commands:");
             data.push(commands.map((command) => command.name).join(", "));
             data.push(
-                `\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`
+                `\nYou can send \`${cmdPrefix}help [command name]\` to get info on a specific command!`
             );
 
             return message.author
@@ -48,7 +48,9 @@ module.exports = {
         if (command.description)
             data.push(`**Description:** ${command.description}`);
         if (command.usage)
-            data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
+            data.push(
+                `**Usage:** ${cmdPrefix}${command.name} ${command.usage}`
+            );
 
         message.channel.send(data, { split: true });
     },
