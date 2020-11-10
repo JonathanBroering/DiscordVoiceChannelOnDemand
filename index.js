@@ -81,26 +81,19 @@ client.on("message", async (message) => {
     }
 });
 
-// Event if a Userer joined or switched his voice Channel
+// Event if a user joined or switched his voice Channel
 client.on("voiceStateUpdate", (oldMember, newMember) => {
-    // Check if the Channel the user joined or switched to has the same id as newchannel_channel | dunno if this is the right way to do it, seems messy
-    if (
-        (newMember.channel !== null &&
-            oldMember.channel === null &&
-            newMember.channel.id === newchannel_id) ||
-        (newMember.channel !== null &&
-            oldMember.channel !== null &&
-            newMember.channel.id === newchannel_id)
-    ) {
+    // Check if the Channel the user joined or switched to has the same id as newchannel
+    if (newMember.channel && newMember.channel.id === newchannel_id) {
         var current_user = newMember.member.user;
         console.log(
             current_user.username +
                 " requested a new Channel, setting up the Channel now!"
         );
 
-        // This will create a new voice channel for the request
+        // Create a new voice channel for the request
         var server = newMember.guild;
-        // This sets up the voice channel with the permissions for it
+        // Set up the voice channel with the permissions for it
         var channel = {
             type: "voice",
             parent: privatechannel_id,
@@ -112,14 +105,14 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
         server.channels
             .create(current_user.username, channel)
             .then((channel) => {
-                newMember.setChannel(channel);
+                newMember.setChannel(channel).catch(console.error);
                 userchannellist.push(channel);
             });
     }
 
-    // deltes userchannel if the channel was created with this bot & is empty now
+    // Delete userchannel if the channel was created with this bot & is empty now
     if (
-        oldMember.channel !== null &&
+        oldMember.channel &&
         userchannellist.includes(oldMember.channel) &&
         oldMember.channel.members.size === 0
     ) {
